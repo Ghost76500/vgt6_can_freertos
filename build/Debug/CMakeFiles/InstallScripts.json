@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"E:/STM32Project/vgt6_can_freertos/build/Debug/cmake_install.cmake",
+		"E:/STM32Project/vgt6_can_freertos/build/Debug/cmake/stm32cubemx/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
