@@ -107,6 +107,8 @@ typedef enum
   CHASSIS_VECTOR_NO_FOLLOW_YAW,      // 底盘有旋转速度控制
   CHASSIS_VECTOR_RAW,                // 直接向CAN发送电流控制
   CHASSIS_VECTOR_DEFINED             // 底盘云台独立运动
+  //CHASSIS_RUN_MAP,                // 底盘有全局路径跟随闭环（未实现）
+  //CHASSIS_VISUAL_CALIBRATION,        // 视觉标定模式（未实现）
 } chassis_mode_e;
 
 typedef struct
@@ -149,12 +151,6 @@ typedef struct
 
 } chassis_move_t;
 
-/*
-// 调试/上位机监视用：暴露底盘状态结构体
-// 注意：该结构体在底盘任务中更新，读取时如需强一致性请自行加保护。
-extern chassis_move_t chassis_move;
-*/
-
 /*-----------------------------------外部函数声明-----------------------------------*/
 
 /**
@@ -178,52 +174,7 @@ extern chassis_move_t chassis_move;
  * @param[in] none
  * @retval 电流值
  */
-uint16_t get_chassis_current(void);
-
-/**
- * @brief 全局底盘任务初始化函数
- * @param[in] none
- * @retval none
- */
-extern void global_chassis_task_init(void);
-
-/**
- * @brief 底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 40ms
- * @param[in] none
- * @retval none
- */
-extern void chassis_task_cycle(void);
-
-/**
- * @brief 设置底盘速度指令（车体坐标系），单位 m/s
- * @note 坐标约定：x 正方向=向左，y 正方向=向前
- * @param[in] vx x 方向速度（向左为正）
- * @param[in] vy y 方向速度（向前为正）
- */
-void chassis_cmd_set_speed(fp32 vx, fp32 vy);
-
-/**
- * @brief 设置底盘航向角目标（绝对角，单位 rad，范围建议为[-PI, PI]）
- * @note 使能后，底盘会通过角度PID输出 wz_set（rad/s）来跟踪该航向。
- */
-void chassis_cmd_set_yaw_abs(fp32 yaw_rad);
-
-/**
- * @brief 设置底盘航向角目标（相对角，单位 rad）
- * @note 该函数会基于“当前底盘chassis_yaw”锁存一次目标角。
- */
-void chassis_cmd_set_yaw_rel(fp32 yaw_delta_rad);
-
-/**
- * @brief 关闭航向角闭环（恢复为外部直接给wz的方式，默认wz为0）
- */
-void chassis_cmd_disable_yaw_hold(void);
-
-/**
- * @brief 直接设置底盘旋转角速度指令（开环/速度控制），单位 rad/s
- * @note 仅在关闭航向角闭环后生效。
- */
-void chassis_cmd_set_wz(fp32 wz_rad_s);
+//uint16_t get_chassis_current(void);
 
 /**
  * @brief 便捷接口：设置(x, y, 目标航向角)（车体坐标系）
@@ -234,24 +185,12 @@ void chassis_cmd_set_wz(fp32 wz_rad_s);
  */
 void chassis_set_control_target(fp32 vx, fp32 vy, fp32 yaw_rad);
 
+/**
+ * @brief 关闭航向角闭环（恢复为外部直接给wz的方式，默认wz为0）
+ */
+void chassis_cmd_disable_yaw_hold(void);
+
 // ==================== 世界系速度控制接口 ====================
-
-/**
- * @brief 设置底盘速度指令（世界坐标系），单位 m/s
- * @note 坐标约定：x 正方向=向左，y 正方向=向前
- * @param[in] vx_world x 方向速度（向左为正）
- * @param[in] vy_world y 方向速度（向前为正）
- * @note 调用后自动启用世界系模式，内部会根据当前yaw做坐标变换
- */
-void chassis_cmd_set_speed_world(fp32 vx_world, fp32 vy_world);
-
-/**
- * @brief 设置底盘速度指令（车体坐标系），并关闭世界系模式
- * @note 坐标约定：x 正方向=向左，y 正方向=向前
- * @param[in] vx x 方向速度（向左为正）
- * @param[in] vy y 方向速度（向前为正）
- */
-void chassis_cmd_set_speed_body(fp32 vx, fp32 vy);
 
 /**
  * @brief 关闭世界系速度控制，恢复为车体系

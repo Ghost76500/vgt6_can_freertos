@@ -8,7 +8,7 @@
 
 
 extern void oled_init(void);
-extern void oled_task(uint8_t *code_data);
+extern void oled_show(uint8_t *code_data);
 
 
 #endif // BSP_OLED_H

@@ -11,7 +11,7 @@ void oled_init(void)
     delay_ms(2);
 }
 
-void oled_task(uint8_t *code_data)
+void oled_show(uint8_t *code_data)
 {
     OLED_Clear();
     // 将传入的数据复制到显示缓冲区

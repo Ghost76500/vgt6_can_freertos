@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include "gm65.h"
 #include <string.h>
-#include "blue_control.h"
 
 
 uint8_t zdt_rx_data[32] = {0}; // DMA接收缓冲区
@@ -61,8 +60,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
     if (huart->Instance == USART3)
     {
-        // 蓝牙模块DMA空闲接收回调
-        Blue_RxEventCallback(huart, Size);
 
     }
 }

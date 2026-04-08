@@ -65,7 +65,6 @@ void USART3_IRQHandler(void);
 void UART4_IRQHandler(void);
 void UART5_IRQHandler(void);
 void TIM6_IRQHandler(void);
-void TIM7_IRQHandler(void);
 void DMA2_Channel3_IRQHandler(void);
 void DMA2_Channel4_5_IRQHandler(void);
 /* USER CODE BEGIN EFP */

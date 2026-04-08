@@ -197,13 +197,7 @@
 				35,
 				36,
 				37,
-				38,
-				39,
-				40,
-				41,
-				42,
-				43,
-				44
+				38
 			]
 		},
 		{
@@ -388,13 +382,7 @@
 				35,
 				36,
 				37,
-				38,
-				39,
-				40,
-				41,
-				42,
-				43,
-				44
+				38
 			]
 		},
 		{
@@ -408,6 +396,12 @@
 			"name" : "Object Libraries",
 			"sourceIndexes" : 
 			[
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
 				45,
 				46,
 				47,
@@ -428,13 +422,7 @@
 				62,
 				63,
 				64,
-				65,
-				66,
-				67,
-				68,
-				69,
-				70,
-				71
+				65
 			]
 		}
 	],
@@ -545,19 +533,7 @@
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
-			"path" : "User/mpu6050.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
 			"path" : "User/pid.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
-			"path" : "User/rc_ibus.c",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -581,18 +557,6 @@
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
-			"path" : "Application/blue_control.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
-			"path" : "Application/chassis_behaviour.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
 			"path" : "Application/chassis_task.c",
 			"sourceGroupIndex" : 0
 		},
@@ -611,19 +575,13 @@
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
-			"path" : "Application/mission_fsm.c",
+			"path" : "Application/position_task.c",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
 			"path" : "Application/test_task.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
-			"path" : "Application/trajectory_planner.c",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -642,12 +600,6 @@
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
 			"path" : "Bsp/Emm_V5.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 8,
-			"compileGroupIndex" : 0,
-			"path" : "Bsp/ZDT_X42_V2.c",
 			"sourceGroupIndex" : 0
 		},
 		{

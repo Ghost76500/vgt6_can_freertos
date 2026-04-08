@@ -16,6 +16,7 @@
 #include "bsp_delay.h"
 #include "stm32f1xx_hal.h"
 #include "tim.h"
+#include "cmsis_os2.h"
 
 void delay_ms(uint16_t ms)
 {

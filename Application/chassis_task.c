@@ -165,27 +165,34 @@ void chassis_set_world_target_yaw(fp32 vx_world, fp32 vy_world, fp32 yaw_rad)
 
 /*-----------------------------------函数实现-----------------------------------*/
 
-void chassis_task(void const *pvParameters)
+void chassis_task(void *argument)
 {
+  osDelay(CHASSIS_TASK_INIT_TIME); // 等待系统稳定
   // 底盘初始化,包括pid初始化、jgb37底盘电机指针初始化、陀螺仪角度指针初始化
-  // 因为是裸机，所以要放到其他地方初始化
-  // chassis_init(&chassis_move);
+  chassis_init(&chassis_move);
+  
+  // 获取单片机从开机到当前时刻的系统滴答数
+  uint32_t PreviousWakeTime = osKernelGetTickCount();
 
-  //GPIOD->BSRR = GPIO_PIN_6; 
+  for (;;)
+  {
+    // 底盘数据更新
+    chassis_feedback_update(&chassis_move);
+    // 底盘控制量设置
+    chassis_set_control(&chassis_move);
 
-  // 底盘数据更新
-  chassis_feedback_update(&chassis_move);
-  // 底盘控制量设置
-  chassis_set_control(&chassis_move);
+    // 底盘控制PID计算
+    chassis_control_loop(&chassis_move);
 
-  // 底盘控制PID计算
-  chassis_control_loop(&chassis_move);
-
-  // 发送控制PWM
-  pwm_cmd_chassis(chassis_move.motor_chassis[0].give_pwm, chassis_move.motor_chassis[1].give_pwm,
+    // 发送控制PWM
+    pwm_cmd_chassis(chassis_move.motor_chassis[0].give_pwm, chassis_move.motor_chassis[1].give_pwm,
                   chassis_move.motor_chassis[2].give_pwm, chassis_move.motor_chassis[3].give_pwm);
 
-  //GPIOD->BRR = GPIO_PIN_6; 
+    PreviousWakeTime += CHASSIS_CONTROL_TIME_MS; 
+    osDelayUntil(PreviousWakeTime);
+
+    //osDelay(CHASSIS_CONTROL_TIME_MS); // 40ms周期
+  }
 }
 
 
@@ -249,13 +256,14 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update) // 1
     return;
   }
 
+  encoder_update_all(); // 更新编码器数据，必须在获取速度之前调用
+  
   uint8_t i = 0;
   for (i = 0; i < 4; i++)
   {
     // 更新电机速度，加速度是速度的PID微分
-    //chassis_move_update->motor_chassis[i].speed = CHASSIS_MOTOR_RPM_TO_VECTOR_SEN * chassis_move_update->motor_chassis[i].chassis_motor_measure->speed_rpm;
+    
     chassis_move_update->motor_chassis[i].accel = chassis_move_update->motor_speed_pid[i].Dbuf[0] * CHASSIS_CONTROL_FREQUENCE;
-    // 编码器编号与电机编号保持一致：M1->ENC1, M2->ENC2, M3->ENC3, M4->ENC4
     chassis_move_update->motor_chassis[i].speed = ENCODER_DELTA_TO_VECTOR_SEN * encoder_get_speed(i + 1);
   }
 
@@ -264,12 +272,7 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update) // 1
   chassis_move_update->vy = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed + chassis_move_update->motor_chassis[2].speed + chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_VY;
   chassis_move_update->wz = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed - chassis_move_update->motor_chassis[2].speed - chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
 
-  // 计算底盘姿态角度，如果底盘上有陀螺仪请更改这部分代码
-  // 无云台：直接使用 MPU6050 解算角（单位 rad）
-  //chassis_move_update->chassis_yaw = rad_format(*(chassis_move_update->chassis_INS_angle + INS_YAW_ADDRESS_OFFSET));
-  //chassis_move_update->chassis_pitch = rad_format(*(chassis_move_update->chassis_INS_angle + INS_PITCH_ADDRESS_OFFSET));
-  //chassis_move_update->chassis_roll = rad_format(*(chassis_move_update->chassis_INS_angle + INS_ROLL_ADDRESS_OFFSET));
-  // 只有底盘角度：直接使用 BMI088 解算角（单位 rad）
+  // 计算底盘姿态角度
   chassis_move_update->chassis_yaw = rad_format(*(chassis_move_update->chassis_INS_angle));
 }
 
@@ -353,44 +356,18 @@ static void chassis_set_control(chassis_move_t *chassis_move_control) // 2
   }
 
   test_angle_set = chassis_move_control->chassis_yaw_set;
-  
-
-  /*
-  // 原始控制模式，开环控制
-  else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RAW)
-  {
-    // 在原始模式，设置值发送到CAN总线
-    chassis_move_control->vx_set = vx_set;
-    chassis_move_control->vy_set = vy_set;
-    chassis_move_control->wz_set = angle_set;
-    chassis_move_control->chassis_cmd_slow_set_vx.out = 0.0f;
-    chassis_move_control->chassis_cmd_slow_set_vy.out = 0.0f;
-  }
-  */
 }
 
 
 static void chassis_vector_to_mecanum_wheel_speed(const fp32 vx_set, const fp32 vy_set, const fp32 wz_set, fp32 wheel_speed[4]) // 3.5
 {
   // 数组中四个轮子按顺序分别为左前、右前、左后、右后
-
-  // 旋转的时候，由于云台靠前，所以是前面两轮0、1旋转的速度变慢，后面两轮2、3旋转的速度变快
   vx_set_tem = vx_set;
   vy_set_tem = vy_set;
-  //wheel_speed[0] = -vx_set_tem - vy_set_tem + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DIST ANCE_TO_CENTER * wz_set;
-  //wheel_speed[1] = vx_set_tem - vy_set_tem + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
-  //wheel_speed[2] = vx_set_tem + vy_set_tem + (-CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
-  //wheel_speed[3] = -vx_set_tem + vy_set_tem + (-CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
-  // 说明：本工程在 chassis_control_loop() 中对 3/4 号轮应用了方向修正
-  // (wheel_speed[2/3] *= CHASSIS_WHEEL3/4_DIR，当前为 -1)。
-  // 为保证“直走不受影响、平移方向正确”，这里按标准麦轮(X型)运动学先求出期望轮速，
-  // 并对后轮做一次预翻转，使得乘完 DIR 后得到正确的最终轮速。
-  // 标准(最终)轮速：
   //   FL = vx - vy - L*wz
   //   FR = vx + vy - L*wz
   //   RL = vx + vy + L*wz
   //   RR = vx - vy + L*wz
-  // 预翻转后轮：pre_RL = -RL, pre_RR = -RR
   wheel_speed[0] =  vx_set_tem - vy_set_tem - MOTOR_DISTANCE_TO_CENTER * wz_set;   // FL
   wheel_speed[1] =  vx_set_tem + vy_set_tem + MOTOR_DISTANCE_TO_CENTER * wz_set;   // FR
   wheel_speed[2] = -(vx_set_tem + vy_set_tem - MOTOR_DISTANCE_TO_CENTER * wz_set); // RL (pre-flip)
@@ -472,6 +449,10 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop) // 3
     }
   }
 
+  // 发送can速度
+
+
+
   // 计算pid
   for (i = 0; i < 4; i++)
   {
@@ -498,11 +479,6 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop) // 3
     }
     chassis_move_control_loop->motor_chassis[i].give_pwm = pwm;
   }
-}
-
-void global_chassis_task_init(void)
-{
-  chassis_init(&chassis_move);
 }
 
 const chassis_move_t *get_chassis_move_data(void)

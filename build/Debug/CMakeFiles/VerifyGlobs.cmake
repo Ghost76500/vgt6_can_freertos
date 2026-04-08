@@ -6,14 +6,11 @@ file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "E:/STM32Project/vgt6_can_free
 set(OLD_GLOB
   "E:/STM32Project/vgt6_can_freertos/Application/CAN_receive.c"
   "E:/STM32Project/vgt6_can_freertos/Application/UART_receive.c"
-  "E:/STM32Project/vgt6_can_freertos/Application/blue_control.c"
-  "E:/STM32Project/vgt6_can_freertos/Application/chassis_behaviour.c"
   "E:/STM32Project/vgt6_can_freertos/Application/chassis_task.c"
   "E:/STM32Project/vgt6_can_freertos/Application/dc_motor.c"
   "E:/STM32Project/vgt6_can_freertos/Application/gimbal_behaviour.c"
-  "E:/STM32Project/vgt6_can_freertos/Application/mission_fsm.c"
+  "E:/STM32Project/vgt6_can_freertos/Application/position_task.c"
   "E:/STM32Project/vgt6_can_freertos/Application/test_task.c"
-  "E:/STM32Project/vgt6_can_freertos/Application/trajectory_planner.c"
   "E:/STM32Project/vgt6_can_freertos/Application/visual_task.c"
   "E:/STM32Project/vgt6_can_freertos/Application/zdt_motor.c"
   )
@@ -26,7 +23,6 @@ endif()
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "E:/STM32Project/vgt6_can_freertos/Bsp/*.c")
 set(OLD_GLOB
   "E:/STM32Project/vgt6_can_freertos/Bsp/Emm_V5.c"
-  "E:/STM32Project/vgt6_can_freertos/Bsp/ZDT_X42_V2.c"
   "E:/STM32Project/vgt6_can_freertos/Bsp/bsp_buzzer_pwm.c"
   "E:/STM32Project/vgt6_can_freertos/Bsp/bsp_can.c"
   "E:/STM32Project/vgt6_can_freertos/Bsp/bsp_delay.c"
@@ -49,9 +45,7 @@ set(OLD_GLOB
   "E:/STM32Project/vgt6_can_freertos/User/OLED.c"
   "E:/STM32Project/vgt6_can_freertos/User/OLED_Data.c"
   "E:/STM32Project/vgt6_can_freertos/User/gm65.c"
-  "E:/STM32Project/vgt6_can_freertos/User/mpu6050.c"
   "E:/STM32Project/vgt6_can_freertos/User/pid.c"
-  "E:/STM32Project/vgt6_can_freertos/User/rc_ibus.c"
   "E:/STM32Project/vgt6_can_freertos/User/user_lib.c"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

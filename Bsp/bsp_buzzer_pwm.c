@@ -3,7 +3,7 @@
 
 void buzzer_init(void)
 {
-    // 假设使用 TIM14 的通道 1 作为蜂鸣器 PWM 输出
+    // 使用 TIM14 的通道 1 作为蜂鸣器 PWM 输出
     HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);
     
     // 初始设置为静音
@@ -51,7 +51,7 @@ void gimbal_warn_buzzer_off(void)
 
 void chassis_warn_buzzer_on(void)
 {
-    Buzzer_Control(1500, 50); // 2kHz, 50% 音量
+    Buzzer_Control(1500, 50); // 1.5kHz, 50% 音量
 }
 
 void chassis_warn_buzzer_off(void)

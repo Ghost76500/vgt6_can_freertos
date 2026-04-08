@@ -42,15 +42,11 @@
 #include "bsp_encoder.h"
 #include "bsp_usart.h"
 #include "chassis_task.h"
-#include "chassis_behaviour.h"
+#include "position_task.h"
 #include "dc_motor.h"
 #include "OLED.h"
 #include "test_task.h"
 #include <string.h>
-#include "rc_ibus.h"
-#include "mission_fsm.h"
-#include "blue_control.h"
-#include "trajectory_planner.h"
 
 /* USER CODE END Includes */
 
@@ -103,21 +99,21 @@ void chassis_data_send(UART_HandleTypeDef *huart)// uart句柄
     }
     last_send_tick = now_tick;
 
-    const chassis_odometry_t *behaviour = get_behaviour_data();
+    const chassis_odometry_t *position = get_position_data();
     const chassis_move_t *chassis = get_chassis_move_data();
 
-    if ((behaviour == NULL) || (chassis == NULL))
+    if ((position == NULL) || (chassis == NULL))
     {
       return;
     }
 
     int len = snprintf(msg, sizeof(msg),
                        "chassis:%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
-                       behaviour->position_x,      // ch0: 里程计X
-                       behaviour->position_y,      // ch1: 里程计Y
-                       behaviour->position_x_set,  // ch2: 目标X
-                       behaviour->position_y_set,  // ch3: 目标Y
-                       behaviour->yaw_set,         // ch4: 外环目标角度(yaw)
+                       position->position_x,      // ch0: 里程计X
+                       position->position_y,      // ch1: 里程计Y
+                       position->position_x_set,  // ch2: 目标X
+                       position->position_y_set,  // ch3: 目标Y
+                       position->yaw_set,         // ch4: 外环目标角度(yaw)
                        chassis->chassis_yaw,       // ch5: 当前底盘航向角(yaw)
                        chassis->vx,                // ch6: 底盘X轴速度(vx)
                        chassis->vy,                // ch7: 底盘Y轴速度(vy)
@@ -168,7 +164,6 @@ int main(void)
   MX_USART3_UART_Init();
   MX_I2C1_Init();
   MX_TIM14_Init();
-  MX_TIM7_Init();
   MX_TIM10_Init();
   MX_TIM11_Init();
   MX_I2C2_Init();
@@ -186,26 +181,23 @@ int main(void)
   buzzer_init(); // 初始化蜂鸣器 PWM
   bsp_servo_pwm_init(); // 初始化云台和夹爪舵机 PWM
   dc_motor_pwm_init(); // 初始化电机 PWM
-  HAL_TIM_Base_Start_IT(&htim7); // 启动 TIM7 中断,用于周期任务调度,1ms
+  //HAL_TIM_Base_Start_IT(&htim7); // 启动 TIM7 中断,用于周期任务调度,1ms
 
   uart_init_dma(&huart4); // 初始化 UART4 DMA 接收（空闲模式）
   uart_init_dma(&huart1); // 初始化 UART1 DMA 接收
   uart_init_it(&huart5); // 初始化 UART 接收中断
-  Blue_Control_Init(&huart3);
 
-  // UART/DMA 初始化后留 10ms 稳定时间
   delay_ms(10);
   
-  global_behaviour_init(); // 全局行为初始化
-  global_chassis_task_init(); // 底盘初始化
+  //global_position_init(); // 全局位置初始化
+  //global_chassis_task_init(); // 底盘初始化
   bsp_encoder_init(); // 初始化编码器
 
   OLED_Init();
-  Mission_FSM_Init();
   //RC_IBUS_Init(&rc_ibus, &huart3, 0.06f, 300);
   //global_trajectory_planner_init(); // 轨迹规划器初始化
 
-  
+  //position_enable(1);
   delay_ms(1500); // 等待任务开始后系统稳定
   bsp_led_on(CORE_ONE);
  
@@ -230,7 +222,7 @@ int main(void)
     //Key_Handle_Loop(); // 按键处理循环
     //process_data(&huart5); // 处理gm65接收到的数据
     //GPIOD->BSRR = GPIO_PIN_7; 
-    //behaviour_task_cycle(); // 底盘行为控制
+    //position_task_cycle(); // 底盘位置环控制
     //chassis_task_cycle(); // 底盘速度控制
     //GPIOD->BRR = GPIO_PIN_7; 
     //chassis_data_send(&huart3); // 发送底盘状态数据

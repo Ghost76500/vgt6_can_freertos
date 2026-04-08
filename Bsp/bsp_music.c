@@ -6,6 +6,7 @@
 #include "bsp_music.h"
 #include "tim.h" // 如果你用CubeMX生成，通常定时器句柄在 tim.h 或 main.h 中
 #include "bsp_buzzer_pwm.h" // 包含蜂鸣器控制头文件
+#include "cmsis_os2.h" // FreeRTOS 2.0 API
 
 /* * 函数名：Play_Song
  * 功能：按照乐谱播放音乐
@@ -20,12 +21,12 @@ void Play_Song(const Note* song, uint16_t length, uint8_t volume)
         Buzzer_Control(song[i].frequency, volume);
         
         // 保持发声指定的时间
-        HAL_Delay(song[i].duration);
+        osDelay(song[i].duration);
         
         // --- 断奏处理 ---
         // 为了让音符之间有区分感，稍微停顿一小会儿
         Buzzer_Control(0, 0); // 静音
-        HAL_Delay(20);        // 短暂停顿
+        osDelay(20);        // 短暂停顿
     }
 }
 

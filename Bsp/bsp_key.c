@@ -17,7 +17,7 @@
 #include "test_task.h"
 #include "dc_motor.h"
 #include "chassis_task.h"
-#include "chassis_behaviour.h"
+#include "position_task.h"
 
 /* ================== 私有类型定义 ================== */
 
@@ -102,7 +102,7 @@ static void Key_Execute_Action(Key_ID_t key_id)
             //test_task_run(80.0f);
             //Play_Song(WhiteAlbum, WhiteAlbum_Len, 10);
             //pwm_cmd_chassis(20, 20, 20, 20);
-            behaviour_set_position_yaw(1.0f, 0.0f, 0.0f);
+            position_set_position_yaw(1.0f, 0.0f, 0.0f);
 
             break;
 
@@ -115,7 +115,7 @@ static void Key_Execute_Action(Key_ID_t key_id)
             //Play_Song(BadApple, BadApple_Len, 10);
             //pwm_cmd_chassis(-20, -20, -20, 20);
             //Emm_V5_Stop_Now(1, false);
-            behaviour_enable(1);
+            position_enable(1);
 
             break;
 
@@ -127,7 +127,7 @@ static void Key_Execute_Action(Key_ID_t key_id)
             //test_task_run(0.0f);
             //Play_Song(FuwaFuwaTime, FuwaFuwaTime_Len, 10);
             //pwm_cmd_chassis(0, 0, 0, 0);
-            behaviour_disable();
+            position_disable();
 
             break;
 
@@ -139,7 +139,7 @@ static void Key_Execute_Action(Key_ID_t key_id)
             //Emm_V5_Pos_Control(1, 1, 3000, 255, 150000, false, false); // 位置控制
             //Play_Song(Haruhikage_Full, Haruhikage_Full_Len, 10);
             //chassis_set_world_target_yaw(0.0f, 0.3f,0.0f);
-            behaviour_set_position_yaw(0.0f, 3.0f, 0.0f);
+            position_set_position_yaw(0.0f, 3.0f, 0.0f);
             //test_task_circle_start();
             //Play_Song(SenrenBanka, SenrenBanka_Len, 50);
             
@@ -153,7 +153,7 @@ static void Key_Execute_Action(Key_ID_t key_id)
             //Emm_V5_Stop_Now(1, false);
             //Play_Song(Mixue_Theme, Mixue_Theme_Len, 10);
             //Emm_V5_Stop_Now(1, false);
-            behaviour_set_position_yaw(0.0f, 0.0f, 0.0f);
+            position_set_position_yaw(0.0f, 0.0f, 0.0f);
             //test_task_circle_face_center_start();
             //Play_Song(MyBeloved, MyBeloved_Len, 50);    
 

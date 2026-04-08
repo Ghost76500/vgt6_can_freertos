@@ -52,14 +52,40 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for CHASSIS_TASK */
 osThreadId_t CHASSIS_TASKHandle;
 const osThreadAttr_t CHASSIS_TASK_attributes = {
   .name = "CHASSIS_TASK",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal1,
+};
+/* Definitions for POSITION_TASK */
+osThreadId_t POSITION_TASKHandle;
+const osThreadAttr_t POSITION_TASK_attributes = {
+  .name = "POSITION_TASK",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for MAIN_TASK */
+osThreadId_t MAIN_TASKHandle;
+const osThreadAttr_t MAIN_TASK_attributes = {
+  .name = "MAIN_TASK",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityBelowNormal,
+};
+/* Definitions for UART_RX_TASK */
+osThreadId_t UART_RX_TASKHandle;
+const osThreadAttr_t UART_RX_TASK_attributes = {
+  .name = "UART_RX_TASK",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for uart1_queue */
+osMessageQueueId_t uart1_queueHandle;
+const osMessageQueueAttr_t uart1_queue_attributes = {
+  .name = "uart1_queue"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,6 +95,9 @@ const osThreadAttr_t CHASSIS_TASK_attributes = {
 
 void StartDefaultTask(void *argument);
 extern void chassis_task(void *argument);
+extern void position_task(void *argument);
+extern void main_task(void *argument);
+extern void uart_rx_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -94,6 +123,10 @@ void MX_FREERTOS_Init(void) {
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of uart1_queue */
+  uart1_queueHandle = osMessageQueueNew (4, sizeof(void*), &uart1_queue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -104,6 +137,15 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of CHASSIS_TASK */
   CHASSIS_TASKHandle = osThreadNew(chassis_task, NULL, &CHASSIS_TASK_attributes);
+
+  /* creation of POSITION_TASK */
+  POSITION_TASKHandle = osThreadNew(position_task, NULL, &POSITION_TASK_attributes);
+
+  /* creation of MAIN_TASK */
+  MAIN_TASKHandle = osThreadNew(main_task, NULL, &MAIN_TASK_attributes);
+
+  /* creation of UART_RX_TASK */
+  UART_RX_TASKHandle = osThreadNew(uart_rx_task, NULL, &UART_RX_TASK_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
