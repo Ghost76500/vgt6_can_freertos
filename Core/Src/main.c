@@ -189,20 +189,11 @@ int main(void)
 
   delay_ms(10);
   
-  //global_position_init(); // 全局位置初始化
-  //global_chassis_task_init(); // 底盘初始化
   bsp_encoder_init(); // 初始化编码器
 
   OLED_Init();
-  //RC_IBUS_Init(&rc_ibus, &huart3, 0.06f, 300);
-  //global_trajectory_planner_init(); // 轨迹规划器初始化
 
-  //position_enable(1);
-  delay_ms(1500); // 等待任务开始后系统稳定
   bsp_led_on(CORE_ONE);
- 
-  // 启动任务
-  //Mission_Start(pickup_mission, sizeof(pickup_mission)/sizeof(pickup_mission[0]));
 
   /* USER CODE END 2 */
 

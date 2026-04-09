@@ -1,5 +1,6 @@
 #include "bsp_buzzer_pwm.h"
 #include "tim.h"
+#include "cmsis_os2.h"
 
 void buzzer_init(void)
 {
@@ -15,7 +16,7 @@ void buzzer_init(void)
  * frequency: 声音频率 (Hz)，比如 2000 代表 2kHz
  * volume:    音量 (0 - 100)，0为静音，100为最大音量
  */
-void Buzzer_Control(uint16_t frequency, uint8_t volume)
+void buzzer_control(uint16_t frequency, uint8_t volume)
 {
     if (frequency == 0 || volume == 0)
     {
@@ -38,23 +39,9 @@ void Buzzer_Control(uint16_t frequency, uint8_t volume)
     __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, ccr_value);
 }
 
-
-void gimbal_warn_buzzer_on(void)
+void buzzer_rings(uint16_t frequency, uint8_t volume, uint16_t ring_time_ms)
 {
-    Buzzer_Control(2000, 50); // 2kHz, 50% 音量
-}
-
-void gimbal_warn_buzzer_off(void)
-{
-    Buzzer_Control(0, 0); // 静音
-}
-
-void chassis_warn_buzzer_on(void)
-{
-    Buzzer_Control(1500, 50); // 1.5kHz, 50% 音量
-}
-
-void chassis_warn_buzzer_off(void)
-{
-    Buzzer_Control(0, 0); // 静音
+    buzzer_control(frequency, volume);
+    osDelay(ring_time_ms);
+    buzzer_control(0, 0); // 静音
 }

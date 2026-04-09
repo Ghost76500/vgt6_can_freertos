@@ -18,14 +18,14 @@ void Play_Song(const Note* song, uint16_t length, uint8_t volume)
     for (int i = 0; i < length; i++)
     {
         // 播放当前音符，音量设为 20 (适中)
-        Buzzer_Control(song[i].frequency, volume);
+        buzzer_control(song[i].frequency, volume);
         
         // 保持发声指定的时间
         osDelay(song[i].duration);
         
         // --- 断奏处理 ---
         // 为了让音符之间有区分感，稍微停顿一小会儿
-        Buzzer_Control(0, 0); // 静音
+        buzzer_control(0, 0); // 静音
         osDelay(20);        // 短暂停顿
     }
 }

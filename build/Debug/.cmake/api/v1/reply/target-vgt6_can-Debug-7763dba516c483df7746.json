@@ -197,7 +197,11 @@
 				35,
 				36,
 				37,
-				38
+				38,
+				39,
+				40,
+				41,
+				42
 			]
 		},
 		{
@@ -382,7 +386,11 @@
 				35,
 				36,
 				37,
-				38
+				38,
+				39,
+				40,
+				41,
+				42
 			]
 		},
 		{
@@ -396,10 +404,6 @@
 			"name" : "Object Libraries",
 			"sourceIndexes" : 
 			[
-				39,
-				40,
-				41,
-				42,
 				43,
 				44,
 				45,
@@ -422,7 +426,11 @@
 				62,
 				63,
 				64,
-				65
+				65,
+				66,
+				67,
+				68,
+				69
 			]
 		}
 	],
@@ -527,6 +535,12 @@
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
+			"path" : "User/command.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
 			"path" : "User/gm65.c",
 			"sourceGroupIndex" : 0
 		},
@@ -575,6 +589,18 @@
 		{
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
+			"path" : "Application/main_task.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
+			"path" : "Application/music_task.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
 			"path" : "Application/position_task.c",
 			"sourceGroupIndex" : 0
 		},
@@ -582,6 +608,12 @@
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
 			"path" : "Application/test_task.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
+			"path" : "Application/uart_rx_task.c",
 			"sourceGroupIndex" : 0
 		},
 		{

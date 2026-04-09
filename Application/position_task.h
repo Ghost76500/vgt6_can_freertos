@@ -28,6 +28,11 @@
 #define CHASSIS_POSITION_X_LIMIT_M         2.3f
 #define CHASSIS_POSITION_Y_LIMIT_M         2.3f
 
+#define YOUBIAN 3.1415926f
+#define ZUOBIAN -3.1415926f
+#define QIANMIAN 1.5707963f
+#define HOUMIAN -1.5707963f
+
 typedef enum {
     CHASSIS_MODE_MANUAL = 0,
     CHASSIS_MODE_AUTO_NAV,

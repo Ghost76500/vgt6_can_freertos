@@ -10,8 +10,11 @@
 				"E:/STM32Project/vgt6_can_freertos/Application/chassis_task.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/dc_motor.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/gimbal_behaviour.c",
+				"E:/STM32Project/vgt6_can_freertos/Application/main_task.c",
+				"E:/STM32Project/vgt6_can_freertos/Application/music_task.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/position_task.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/test_task.c",
+				"E:/STM32Project/vgt6_can_freertos/Application/uart_rx_task.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/visual_task.c",
 				"E:/STM32Project/vgt6_can_freertos/Application/zdt_motor.c"
 			],
@@ -41,6 +44,7 @@
 			[
 				"E:/STM32Project/vgt6_can_freertos/User/OLED.c",
 				"E:/STM32Project/vgt6_can_freertos/User/OLED_Data.c",
+				"E:/STM32Project/vgt6_can_freertos/User/command.c",
 				"E:/STM32Project/vgt6_can_freertos/User/gm65.c",
 				"E:/STM32Project/vgt6_can_freertos/User/pid.c",
 				"E:/STM32Project/vgt6_can_freertos/User/user_lib.c"

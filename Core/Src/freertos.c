@@ -82,6 +82,13 @@ const osThreadAttr_t UART_RX_TASK_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
+/* Definitions for MUSIC_TASK */
+osThreadId_t MUSIC_TASKHandle;
+const osThreadAttr_t MUSIC_TASK_attributes = {
+  .name = "MUSIC_TASK",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow1,
+};
 /* Definitions for uart1_queue */
 osMessageQueueId_t uart1_queueHandle;
 const osMessageQueueAttr_t uart1_queue_attributes = {
@@ -98,6 +105,7 @@ extern void chassis_task(void *argument);
 extern void position_task(void *argument);
 extern void main_task(void *argument);
 extern void uart_rx_task(void *argument);
+extern void music_task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -146,6 +154,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of UART_RX_TASK */
   UART_RX_TASKHandle = osThreadNew(uart_rx_task, NULL, &UART_RX_TASK_attributes);
+
+  /* creation of MUSIC_TASK */
+  MUSIC_TASKHandle = osThreadNew(music_task, NULL, &MUSIC_TASK_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
