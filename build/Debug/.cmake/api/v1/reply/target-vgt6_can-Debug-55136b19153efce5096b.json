@@ -201,7 +201,8 @@
 				39,
 				40,
 				41,
-				42
+				42,
+				43
 			]
 		},
 		{
@@ -390,7 +391,8 @@
 				39,
 				40,
 				41,
-				42
+				42,
+				43
 			]
 		},
 		{
@@ -404,7 +406,6 @@
 			"name" : "Object Libraries",
 			"sourceIndexes" : 
 			[
-				43,
 				44,
 				45,
 				46,
@@ -430,7 +431,8 @@
 				66,
 				67,
 				68,
-				69
+				69,
+				70
 			]
 		}
 	],
@@ -554,6 +556,12 @@
 			"backtrace" : 8,
 			"compileGroupIndex" : 0,
 			"path" : "User/user_lib.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 8,
+			"compileGroupIndex" : 0,
+			"path" : "User/visual_identity.c",
 			"sourceGroupIndex" : 0
 		},
 		{

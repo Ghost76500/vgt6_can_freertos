@@ -18,7 +18,7 @@
 
 /*-----------------------------------宏定义-----------------------------------*/
 
-#define POSITION_ODOM_OFFLINE_MISS_THRESHOLD 5U
+#define POSITION_ODOM_OFFLINE_MISS_THRESHOLD 10U
 
 /*-----------------------------------变量声明-----------------------------------*/
 
@@ -32,6 +32,7 @@ static volatile fp32 g_position_target_yaw = 0.0f;
 static volatile uint8_t g_position_enable = 0;
 static volatile uint8_t g_position_odom_fresh = 1; // 位置里程计数据是否新鲜（0=离线/过期, 1=在线/新鲜）
 static volatile uint8_t g_position_odom_miss_cnt = 0; // 位置里程计数据丢失计数器，连续丢失达到一定次数则认为离线
+static volatile uint8_t g_position_arrive_stable_cnt = 0; // 连续到位计数器
 
 /*-----------------------------------内部函数声明-----------------------------------*/
 
@@ -121,6 +122,9 @@ void position_set_position(fp32 x_m, fp32 y_m)
 {
     g_position_target_x = position_clamp_abs(x_m, CHASSIS_POSITION_X_LIMIT_M);
     g_position_target_y = position_clamp_abs(y_m, CHASSIS_POSITION_Y_LIMIT_M);
+    // New target invalidates previous arrival status.
+    chassis_odometry.arrive_flag = 0; // 设置新目标时重置到达状态
+    g_position_arrive_stable_cnt = 0;
 }
 
 /**
@@ -145,6 +149,8 @@ void position_enable(uint8_t latch_current_target)
 {
     g_position_enable = 1;
     chassis_odometry.mode = POSITION_MODE_POSITION;
+    chassis_odometry.arrive_flag = 0; // 使能时重置到达状态
+    g_position_arrive_stable_cnt = 0;
     if (latch_current_target)
     {
         g_position_target_x = chassis_odometry.position_x;
@@ -160,6 +166,8 @@ void position_disable(void)
 {
     g_position_enable = 0;
     chassis_odometry.mode = POSITION_MODE_DISABLE;
+    chassis_odometry.arrive_flag = 0;
+    g_position_arrive_stable_cnt = 0;
     PID_clear(&chassis_odometry.position_x_pid);
     PID_clear(&chassis_odometry.position_y_pid);
 
@@ -211,6 +219,21 @@ void Chassis_Go_Pos(fp32 x_m, fp32 y_m, fp32 yaw_rad, uint16_t delay)
     }
 }
 
+/*
+ * @brief  视觉定位（阻塞等待到位）
+ * @param[in] target 目标标识
+ * @param目标编号 1物料 2色环 3码垛色环
+ * @param[in] x x 像素
+ * @param[in] y y 像素
+ * @param[in] z z 像素差
+ * @param[in] delay 到位后延时（ms）
+ * @retval none
+ */
+void Chassis_Visual_Pos(uint8_t target, int x, int y, int z, uint16_t delay)
+{
+
+}
+
 /*-----------------------------------内部函数实现-----------------------------------*/
 
 static void position_init(chassis_odometry_t *odom_init)
@@ -243,6 +266,7 @@ static void position_init(chassis_odometry_t *odom_init)
 
     odom_init->mode = POSITION_MODE_DISABLE;
     odom_init->arrive_flag = 0;
+    g_position_arrive_stable_cnt = 0;
 
     odom_init->position_x = *(odom_init->position_x_ptr);
     odom_init->position_y = *(odom_init->position_y_ptr);
@@ -295,6 +319,7 @@ static void position_control_calc(chassis_odometry_t *odom_control)
         odom_control->vx_out = 0.0f;
         odom_control->vy_out = 0.0f;
         odom_control->arrive_flag = 0;
+        g_position_arrive_stable_cnt = 0;
         return;
     }
 
@@ -303,6 +328,7 @@ static void position_control_calc(chassis_odometry_t *odom_control)
         odom_control->vx_out = 0.0f;
         odom_control->vy_out = 0.0f;
         odom_control->arrive_flag = 0;
+        g_position_arrive_stable_cnt = 0;
         return;
     }
 
@@ -313,20 +339,38 @@ static void position_control_calc(chassis_odometry_t *odom_control)
     fp32 err_x = odom_control->position_x_set - odom_control->position_x;
     fp32 err_y = odom_control->position_y_set - odom_control->position_y;
 
+    // 到位判定仅使用原始位置误差，不受控制死区影响。
     fp32 dist = sqrtf(err_x * err_x + err_y * err_y);
-    odom_control->arrive_flag = (dist < CHASSIS_POSITION_ARRIVE_THRESHOLD) ? 1 : 0;
-
-    if (fabsf(err_x) < CHASSIS_POSITION_DEADBAND)
+    if (dist < CHASSIS_POSITION_ARRIVE_THRESHOLD)
     {
-        err_x = 0.0f;
+        if (g_position_arrive_stable_cnt < CHASSIS_POSITION_ARRIVE_STABLE_CYCLES)
+        {
+            g_position_arrive_stable_cnt++;
+        }
     }
-    if (fabsf(err_y) < CHASSIS_POSITION_DEADBAND)
+    else
     {
-        err_y = 0.0f;
+        g_position_arrive_stable_cnt = 0;
+    }
+    odom_control->arrive_flag = (g_position_arrive_stable_cnt >= CHASSIS_POSITION_ARRIVE_STABLE_CYCLES) ? 1 : 0;
+
+    fp32 err_x_ctrl = err_x;
+    fp32 err_y_ctrl = err_y;
+
+    // Radial deadband avoids square dead-zone that can stall before arrival.
+    fp32 control_deadband = CHASSIS_POSITION_DEADBAND;
+    if (control_deadband > CHASSIS_POSITION_ARRIVE_THRESHOLD)
+    {
+        control_deadband = CHASSIS_POSITION_ARRIVE_THRESHOLD;
+    }
+    if (dist < control_deadband)
+    {
+        err_x_ctrl = 0.0f;
+        err_y_ctrl = 0.0f;
     }
 
-    odom_control->vx_out = PID_calc(&odom_control->position_x_pid, 0.0f, -err_x);
-    odom_control->vy_out = PID_calc(&odom_control->position_y_pid, 0.0f, -err_y);
+    odom_control->vx_out = PID_calc(&odom_control->position_x_pid, 0.0f, -err_x_ctrl);
+    odom_control->vy_out = PID_calc(&odom_control->position_y_pid, 0.0f, -err_y_ctrl);
 }
 
 static void position_output(chassis_odometry_t *odom_output)

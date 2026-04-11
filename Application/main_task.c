@@ -33,12 +33,16 @@ static void color_ring_calibration(void);
 
 void main_task(void *argument)
 {
-    osDelay(1000); // 任务启动延时，等待外设、速度环、位置环完成初始化
-    buzzer_control(2000, 50); // 蜂鸣器响一下，提示任务开始
+    osDelay(3000); // 任务启动延时，等待外设、速度环、位置环完成初始化
+     // 蜂鸣器响一下，提示任务开始
+    buzzer_rings(2000, 10, 500); // 2kHz频率，20音量，响500ms
     for (;;)
     {
-        Chassis_Go_Pos(-0.15, 0.15, QIANMIAN, 200); // 向右前方移动0.15m，目标航向角-45度，达到后停顿1.5秒
-        Chassis_Go_Pos(-0.15, 1.0, QIANMIAN, 200); // 向左前方移动0.15m，目标航向角+45度，达到后停顿1.5秒
+        Chassis_Go_Pos(-0.15, 0.15, QIANMIAN, 200); // 向右前方移动0.15m，目标航向角-45度，达到后停顿200ms
+        Chassis_Go_Pos(-0.15, 1.0, QIANMIAN, 200); // 向左前方移动0.15m，目标航向角+45度，达到后停顿200ms
+        Chassis_Go_Pos(-0.15, 1.0, YOUBIAN, 200); // 向左后方移动0.15m，目标航向角+135度，达到后停顿200ms
+
+        while(1){osDelay(100);}
     }
 }
 

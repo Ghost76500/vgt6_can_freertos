@@ -51,6 +51,7 @@ set(OLD_GLOB
   "E:/STM32Project/vgt6_can_freertos/User/gm65.c"
   "E:/STM32Project/vgt6_can_freertos/User/pid.c"
   "E:/STM32Project/vgt6_can_freertos/User/user_lib.c"
+  "E:/STM32Project/vgt6_can_freertos/User/visual_identity.c"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
